@@ -55,37 +55,6 @@ class MSE(Cost):
 		avg = sum_squares / n
 		return avg
 
-
-	"""
-	should (y - predictions) be np.sum(y - predictions)? I have no idea, most folks online seem to think yes, I don't. Try np.array([[1], [2], [3]])
-	for y and np.array([[3], [2], [1]]) for predictions. This gives a derivative of 0, and this would be true anytime you have many negative and many
-	positive values for (y - predictions). I feel as though this could artificially decrease the gradient of cost w.r.t. pred (d_cost/d_pred)
-
-	I HAVE THE ANSWER, I'LL DETAIL IT FURTHER SOME OTHER TIME!
-	I was correct, do not sum the values! This was verified using pytorch:
-	
-	import torch
-
-	loss = torch.nn.MSELoss()
-	input = torch.tensor([
-		[1.],
-		[2.],
-		[3.]
-	], requires_grad=True)
-	target = torch.tensor([
-		[3.],
-		[2.],
-		[1.]
-	])
-	z = 1 * input
-	output = loss(input, target)
-	print(output)
-
-	output.backward()
-	print(input.grad)
-
-	The result of their gradient matches that of mine!
-	"""
 	def derivative(self, predictions, Y):
 		n = len(predictions)
 		return (2/n) * (predictions - Y)
