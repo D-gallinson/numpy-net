@@ -154,55 +154,6 @@ class Softmax(Activation):
 		return grads
 
 
-"""
-THERE IS A PROBLEM WITH THE DERIVATIVE HERE CAUSING GRADIENTS TO RAPIDLY EXPLODE
-Testing a basic MNIST network with this causes gradients to explode halfway through
-the first epoch (grads rapidly become >1e50 before applying the alpha). Testing the
-net with num_grad gradient checking makes everything appear fine, though I only checked
-at the first epoch. Forward pass appears fine. Net stats:
-
-60,000 raw images loaded in (training set)
-x = DataLoader.min_max(x)
-data = DataLoader(x, y, 64)
-
-net = Sequential(
-	LinearFC(784, 10),
-	ac.ReLU(),
-	LinearFC(10, 10),
-	ac.Softmax(data.y_all())
-)
-
-cost = ct.CrossEntropy()
-back = Backprop([], [], net, cost)
-
-Replacing ac.Softmax(data.y_all()) with ac.Sigmoid appears to fix this problem.
-"""
-"""
-class Softmax(Activation):
-	def __init__(self, Y):
-		self.function = "Softmax"
-		self.Y = ut.one_hot(Y)
-
-	def __call__(self, x):
-		return self.forward(x)
-
-	def forward(self, x):
-		numer = np.exp(x)
-		denom = np.sum(numer, axis=1)[np.newaxis].T
-		return numer / denom
-
-	def derivative(self, x):
-		grads = np.zeros(x.shape)
-		truth_mat = np.where(self.Y == 1, True, False)
-		softmax = self.forward(x)
-		for row in range(len(grads)):
-			soft_row = softmax[row, :][np.newaxis]
-			row_deriv = np.diagflat(soft_row) - (soft_row.T.dot(soft_row))
-			true_grad = row_deriv[truth_mat[row, :]]
-			grads[row] = true_grad
-		return grads
-"""
-
 
 """
 IMPLEMENT THESE
